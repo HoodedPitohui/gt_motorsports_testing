@@ -11,22 +11,11 @@ inputTable.speed_mph = inputTable.speed_kmh * 0.621371;
 %% Graph the data
 
 plotFRLoadCellData(inputTable.time, inputTable.fr_loadcell, 1, ...
-    length(inputTable.fr_loadcell), inputTable.speed_mph);
+    length(inputTable.fr_loadcell), inputTable.speed_mph, 1, 1);
 
+plotRRLoadCellData(inputTable.time, inputTable.fr_loadcell, 1, ...
+    length(inputTable.fr_loadcell), inputTable.speed_mph, 1, 1);
 
-figure;
-subplot(2, 1, 1);
-plot(inputTable.time, inputTable.rr_loadcell);
-xlabel('time (s)');
-ylabel('load (lbs)');
-title('Rear Load Cell Data (lbs) vs. Time (s)');
-
-
-subplot(2, 1, 2);
-plot(inputTable.time, inputTable.speed_kmh);
-xlabel('time (s)');
-ylabel('speed (kmh)');
-title('Speed (km/h) vs. Time (lbs)');
 
 %% Find and filter for speed values of 0
 

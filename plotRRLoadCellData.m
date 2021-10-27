@@ -1,7 +1,7 @@
-function [] = plotFRLoadCellData(time, frData, min, max, speed, rowNum, index)
+function [] = plotRRLoadCellData(time, rrData, min, max, speed, rowNum, index)
     figure;
     subplot(2, rowNum, index);
-    plot(time(min: max), frData(min:max));
+    plot(time(min: max), rrData(min:max));
     xlabel('time (s)');
     ylabel('load (lbs)');
     tString = [' from t = ', num2str(time(min)), ' - ', num2str(time(max))]
