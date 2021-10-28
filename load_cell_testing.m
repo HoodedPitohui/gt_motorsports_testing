@@ -19,40 +19,39 @@ plotRRLoadCellData(inputTable.time, inputTable.fr_loadcell, 1, ...
     length(inputTable.fr_loadcell), inputTable.speed_mph, 2, 1, 1);
 
 
-%% Find and filter for speed values of 0
+%% Find and filter for the time that the vehicle is actually running
 
-zeroValues = find(inputTable.speed_mph == 0); %find when the speed = 0
-diffsZV = diff(zeroValues); %find the differences
-diffsZVA = find(diffsZV > 1); %get indexes
-%3500 to 3501, 9350 to 9351, 9358 to 9360
+nonZeroValues = find(inputTable.speed_mph >= 5); %Gets an index
+diffIntervals = diff(nonZeroValues);
 
-range1 = [zeroValues(1), zeroValues(diffsZVA(1))];
-range2 = [zeroValues(diffsZVA(1) + 1), zeroValues(diffsZVA(2))];
-range3 = [zeroValues(diffsZVA(2) + 1), zeroValues(diffsZVA(3))];
+% ranges = [];
+init = 1;
+p1 = find(diffIntervals > 1);
+ranges = [nonZeroValues(p1), nonZeroValues(p1 + 1)];
+fRange = [];
+for i = 1: length(ranges)
+    fRange(i, :) = [init, ranges(i, 1)];
+    init = ranges(i , 2);
+end
+fRange(length(ranges) + 1, :) = [init, length(inputTable.time)];
 
 %% Plot the FR Subsets
 
 fig3 = figure('WindowState', 'Maximized');
-plotFRLoadCellData(inputTable.time, inputTable.fr_loadcell, 1, ...
-    range1(1), inputTable.speed_mph, 3, 2, 1);
-
-plotFRLoadCellData(inputTable.time, inputTable.fr_loadcell, range1(2), ...
-    range2(1), inputTable.speed_mph, 3, 2, 3);
-
-plotFRLoadCellData(inputTable.time, inputTable.fr_loadcell, range2(2), ...
-    range3(1), inputTable.speed_mph, 3, 2, 5);
+for i = 1: length(fRange)
+    initPos = 1 + 2 * (i - 1);
+    plotFRLoadCellData(inputTable.time, inputTable.fr_loadcell, fRange(i, 1),...
+        fRange(i, 2), inputTable.speed_mph, length(fRange), 2, initPos);
+end
 
 %% Plot the RR Subsets
 
 fig4 = figure('WindowState', 'Maximized');
-plotRRLoadCellData(inputTable.time, inputTable.rr_loadcell, 1, ...
-    range1(1), inputTable.speed_mph, 3, 2, 1);
-
-plotRRLoadCellData(inputTable.time, inputTable.rr_loadcell, range1(2), ...
-    range2(1), inputTable.speed_mph, 3, 2, 3);
-
-plotRRLoadCellData(inputTable.time, inputTable.rr_loadcell, range2(2), ...
-    range3(1), inputTable.speed_mph, 3, 2, 5);
+for i = 1: length(fRange)
+    initPos = 1 + 2 * (i - 1);
+    plotRRLoadCellData(inputTable.time, inputTable.rr_loadcell, fRange(i, 1),...
+        fRange(i, 2), inputTable.speed_mph, length(fRange), 2, initPos);
+end
 
 
 %% Basic Derivative Testing
