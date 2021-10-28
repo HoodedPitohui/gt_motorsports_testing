@@ -1,4 +1,5 @@
 function [] = plotFRLoadCellData(time, frData, min, max, speed, numRow, numCol, index)
+    %Plot the FR Load Cell data
     subplot(numRow, numCol, index);
     plot(time(min: max), frData(min:max));
     xlabel('time (s)');

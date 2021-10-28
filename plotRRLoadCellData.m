@@ -1,4 +1,5 @@
 function [] = plotRRLoadCellData(time, rrData, min, max, speed, numRow, numCol, index)
+    %Plot the RR load cell data
     subplot(numRow, numCol, index);
     plot(time(min: max), rrData(min:max));
     xlabel('time (s)');

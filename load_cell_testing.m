@@ -54,6 +54,11 @@ for i = 1: length(fRange)
 end
 
 
-%% Basic Derivative Testing
+%% Early fourier transform
+
+fig5 = figure('WindowState', 'Maximized');
+inputTable.fr1_loadcell = fft(inputTable.fr_loadcell);
+plotFRLoadCellData(inputTable.time, inputTable.fr1_loadcell, 1000, ...
+    fRange(1, 2), inputTable.speed_mph, 2, 1, 1);
 
 
