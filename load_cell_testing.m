@@ -57,8 +57,16 @@ end
 %% Early fourier transform
 
 fig5 = figure('WindowState', 'Maximized');
-inputTable.fr1_loadcell = fft(inputTable.fr_loadcell);
-plotFRLoadCellData(inputTable.time, inputTable.fr1_loadcell, 1000, ...
-    fRange(1, 2), inputTable.speed_mph, 2, 1, 1);
+
+%Spitting out magnitudes in the value of 10^3
+% inputTable.fr1_loadcell = fft(inputTable.fr_loadcell);
+fourier_loadcell= fft(inputTable.fr_loadcell(10000:20000));
+a = max(inputTable.fr_loadcell);
+a2 = min(inputTable.fr_loadcell);
+plot(inputTable.time(10000:20000), fourier_loadcell)
+
+% Note there are some extreme signal noises after the fft is done
+% plotFRLoadCellData(inputTable.time, inputTable.fr1_loadcell, 500, ...
+%     1000, inputTable.speed_mph, 2, 1, 1);
 
 
