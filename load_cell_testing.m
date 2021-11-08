@@ -59,14 +59,36 @@ end
 fig5 = figure('WindowState', 'Maximized');
 
 %Spitting out magnitudes in the value of 10^3
-% inputTable.fr1_loadcell = fft(inputTable.fr_loadcell);
-fourier_loadcell= fft(inputTable.fr_loadcell(10000:20000));
-a = max(inputTable.fr_loadcell);
-a2 = min(inputTable.fr_loadcell);
-plot(inputTable.time(10000:20000), fourier_loadcell)
+tv = inputTable.time;
+LC = inputTable.fr_loadcell;
+
+subplot(3, 1, 1);
+plot(tv, LC);
+grid;
+
+Ts = mean(diff(tv));
+Fs = 1 / Ts;
+Fn = Fs / 2;
+L = size(tv, 1);
+
+FTLC = fft(LC) / L;
+z = fix(L / 2);
+Fv = linspace(0, 1, fix(L / 2) + 1) .* Fn;
+Iv = 1:length(Fv);
+
+subplot(3, 1, 2)
+plot(Fv, abs(FTLC(Iv)));
+grid
+
+axis([0  500    ylim]);
+
+% fourier_loadcell= fft(inputTable.fr_loadcell(11100:11200));
+% a = max(inputTable.fr_loadcell);
+% a2 = min(inputTable.fr_loadcell);
+% plot(inputTable.time(11100:11200), fourier_loadcell)
 
 % Note there are some extreme signal noises after the fft is done
-% plotFRLoadCellData(inputTable.time, inputTable.fr1_loadcell, 500, ...
-%     1000, inputTable.speed_mph, 2, 1, 1);
-
+plot(inputTable.time(10000:20000), x);
+plotFRLoadCellData(inputTable.time, inputTable.fr1_loadcell, 10000, ...
+    20000, inputTable.speed_mph, 2, 1, 1);
 
