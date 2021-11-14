@@ -57,38 +57,52 @@ end
 %% Early fourier transform
 
 fig5 = figure('WindowState', 'Maximized');
-
+subplot(3, 1, 1)
+Fs = 100;
 %Spitting out magnitudes in the value of 10^3
-tv = inputTable.time;
-LC = inputTable.fr_loadcell;
-
-subplot(3, 1, 1);
-plot(tv, LC);
-grid;
-
-Ts = mean(diff(tv));
-Fs = 1 / Ts;
-Fn = Fs / 2;
-L = size(tv, 1);
-
-FTLC = fft(LC) / L;
-z = fix(L / 2);
-Fv = linspace(0, 1, fix(L / 2) + 1) .* Fn;
-Iv = 1:length(Fv);
+L = ranges(1, 1) / 100;
+n = 2^nextpow2(L);
+dim = 2;
+data1 = fft(inputTable.rr_loadcell(5000: ranges(1, 1)), n, dim);
+plot(inputTable.time(5000: ranges(1, 1)), data1);
+P2 = abs(data1 / L);
+P1 = P2(1: n/ 2 + 1);
+P1(2: end - 1) = 2 * P1(2: end - 1);
 
 subplot(3, 1, 2)
-plot(Fv, abs(FTLC(Iv)));
-grid
+plot(0:(Fs / n):(Fs / 2 - Fs / n), P1(1: n / 2));
+title('frequency domain graph');
 
-axis([0  500    ylim]);
 
-% fourier_loadcell= fft(inputTable.fr_loadcell(11100:11200));
-% a = max(inputTable.fr_loadcell);
-% a2 = min(inputTable.fr_loadcell);
-% plot(inputTable.time(11100:11200), fourier_loadcell)
 
-% Note there are some extreme signal noises after the fft is done
-plot(inputTable.time(10000:20000), x);
-plotFRLoadCellData(inputTable.time, inputTable.fr1_loadcell, 10000, ...
-    20000, inputTable.speed_mph, 2, 1, 1);
+%% Testing
+fig6 = figure('WindowState', 'Maximized');
+%Find Lengths
+Lf = length(ranges(1, 1));
+%Sample rate
+Step1 = 1/100;
+%Find duration of recordings
+Duration_Flute = Lf / 100;
+%X axis for amplitude vs time plots
+Hzf = [0+Step1:Step1:Duration_Flute];
+%Amplitude vs time plots
+subplot(2,1,1)
+plot(Hzf,inputTable.rr_loadcell(1: ranges(1, 1)))
+xlabel('Time (ms)');
+ylabel('Amplitude');
+% title('2"')(
+% xlabel('Time (ms)')
+% ylabel('Amplitude')
+% subplot(2,2,2)
+
+%FFT calcs
+Xf = abs(fft(inputTable.rr_loadcell(1: ranges(1, 1))))/(2 * Lf);
+%Frequency Calculation
+tf = (0:Lf-1)/(Lf/100);
+
+figure(2)
+%Plot amplitude vs frequency
+subplot(2,1,2)
+plot(tf,abs(Xf))
+
 
