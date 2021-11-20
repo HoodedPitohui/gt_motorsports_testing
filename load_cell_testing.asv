@@ -80,7 +80,5 @@ tRR = (0: lenRR - 1) / (lenRR / Fs);
 %plot of amplitude vs. frequency
 subplot(3, 1, 2);
 plot(tRR, abs(XRR));
-title('Amplitude vs. Frequency (Hz)');
-xlabel('Amplitude');
-ylabel('Frequency (Hz)');
+title
 
