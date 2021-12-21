@@ -58,7 +58,7 @@ end
 
 fig5 = figure('WindowState', 'Maximized');
 Fs = 100; %sampling frequency
-Ys = inputTable.rr_loadcell(2: ranges(1,1)); %sampling data
+Ys = inputTable.rr_loadcell(2: length(inputTable.time)); %sampling data
 lenRR = length(Ys); %find length
 duration = 1 / Fs * lenRR; %duration in time(s)
 step = 0.01;
@@ -84,3 +84,36 @@ title('Amplitude vs. Frequency (Hz)');
 xlabel('Amplitude');
 ylabel('Frequency (Hz)');
 
+%% Attempt 2: fft with average line calculations
+fig6 = figure('WindowState', 'Maximized');
+subplot(4, 1, 1);
+baseLineSet1 = mean(inputTable.rr_loadcell(2: ranges(1, 1)));
+newSet1 = inputTable.rr_loadcell(2: ranges(1, 1)) - baseLineSet1;
+plot(inputTable.time(2: ranges(1, 1)), newSet1);
+
+subplot(4, 1, 2);
+Fs = 100; %sampling frequency
+Ys = newSet1;
+lenRR = length(Ys); %find length
+duration = 1 / Fs * lenRR; %duration in time(s)
+step = 0.01;
+
+%Amplitude vs. Time plot
+HzRR = [0 + step: step:duration];
+plot(HzRR, Ys);
+title('Frequency Vs. Time');
+xlabel('Time (s)');
+ylabel('Amplitude');
+
+%FFT calcs
+XRR = abs(fft(Ys)) / (2 * lenRR);
+
+%Frequency calcs
+tRR = (0: lenRR - 1) / (lenRR / Fs);
+
+%plot of amplitude vs. frequency
+subplot(4, 1, 3);
+plot(tRR, abs(XRR));
+title('Amplitude vs. Frequency (Hz)');
+xlabel('Amplitude');
+ylabel('Frequency (Hz)');
