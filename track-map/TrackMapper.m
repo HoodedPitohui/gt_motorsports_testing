@@ -13,7 +13,7 @@ Limits.lat = [33.776667 33.777639];
 Limits.lon = [-84.400556 -84.398889];
 
 %Plot the original two base points
-MapPlot = figure;
+MapPlot = figure('WindowState', 'maximized');
 plotOrigPoints(Building1, Building2, Limits)
 coneLatCoords = [];
 coneLonCoords = [];
@@ -37,7 +37,13 @@ if (value ~= 'c' | value ~= 'b' | value ~= 'd')
             [lat, lon] = ginput(1);
             d = distance(coneLatCoords, coneLonCoords, lat, lon);
             k = find(d == min(d(:)), 1);
+            
+            %remove datapoints associated with the removed point
             delete(plots{k});
+            plots(k) = [];
+            coneLatCoords(k) = [];
+            coneLonCoords(k) = [];
+            pointCounter = pointCounter - 1;
         else
             pointCounter = pointCounter + 1;
             [coneLatCoords, coneLonCoords, plots{pointCounter}] = plotUserPoint(pointCounter, coneLatCoords, coneLonCoords);
@@ -49,9 +55,13 @@ else
     disp("Please type in c to continue, b to remove the previous point, and d to be done");
 end
 
+%Graph to excel
 filename = 'sample.xlsx';
-writematrix(coneLatCoords, filename, 'Sheet', 1, 'Range', 'A1');
-writematrix(coneLonCoords, filename, 'Sheet', 1, 'Range', 'A2');
+
+header = ["latitude", "longitude"];
+writematrix(header, filename, 'Sheet', 1, 'Range', 'A1');
+writematrix(coneLatCoords', filename, 'Sheet', 1, 'Range', 'A2');
+writematrix(coneLonCoords', filename, 'Sheet', 1, 'Range', 'B2');
 
 %Plot user inputted points
 function [coneLatCoords, coneLonCoords, outPlot] = plotUserPoint(pointCounter, coneLatCoords, coneLonCoords)
@@ -76,6 +86,7 @@ end
 function [dist] = distance(latCoordList, lonCoordList, givenLatCoord, givenLonCoord)
     dist = [sqrt((latCoordList - givenLatCoord).^2 + (lonCoordList - givenLonCoord).^2)];
 end
+
 %Club: Georgia Tech Motorsports (GTMS)
 %Creator: Karthik Shaji
 %Year Created: 2022

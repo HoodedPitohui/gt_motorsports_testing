@@ -38,6 +38,7 @@ if (value ~= 'c' | value ~= 'b' | value ~= 'd')
             d = distance(coneLatCoords, coneLonCoords, lat, lon);
             k = find(d == min(d(:)), 1);
             delete(plots{k});
+            plots{k} = nan;
         else
             pointCounter = pointCounter + 1;
             [coneLatCoords, coneLonCoords, plots{pointCounter}] = plotUserPoint(pointCounter, coneLatCoords, coneLonCoords);
@@ -49,6 +50,7 @@ else
     disp("Please type in c to continue, b to remove the previous point, and d to be done");
 end
 
+%Graph to excel
 filename = 'sample.xlsx';
 writematrix(coneLatCoords, filename, 'Sheet', 1, 'Range', 'A1');
 writematrix(coneLonCoords, filename, 'Sheet', 1, 'Range', 'A2');
@@ -73,9 +75,17 @@ function plotOrigPoints(Building1, Building2, Limits)
     text(Building2.lat, Building2.lon, Building2.label);
 end
 
+function [newData] = moveOutNAN(oldData, index)
+    if (isa(oldData, 'cell'))
+        if (index 
+    else
+    end
+end
+
 function [dist] = distance(latCoordList, lonCoordList, givenLatCoord, givenLonCoord)
     dist = [sqrt((latCoordList - givenLatCoord).^2 + (lonCoordList - givenLonCoord).^2)];
 end
+
 %Club: Georgia Tech Motorsports (GTMS)
 %Creator: Karthik Shaji
 %Year Created: 2022
