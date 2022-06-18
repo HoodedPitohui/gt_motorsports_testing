@@ -3,18 +3,20 @@ clc;
 clear all;
 
 %Pick two reference points
+
+%Building 1 to the left, Building 2 to the right
 Building1.lat = 33.77716;
 Building1.lon = -84.40050;
 Building1.label = "MRDC Building (GT)";
 Building2.lat = 33.77758;
 Building2.lon = -84.39889;
 Building2.label = "Howey Physics Building (GT)";
-Limits.lat = [33.776667 33.777639];
-Limits.lon = [-84.400556 -84.398889];
+Limits.lat = [33.777167 33.778189]; %6
+Limits.lon = [Building1.lon Building2.lon];
 
 %Plot the original two base points
 MapPlot = figure('WindowState', 'maximized');
-plotOrigPoints(Building1, Building2, Limits)
+plotOrigPoints(Building1, Building2, Limits);
 coneLatCoords = [];
 coneLonCoords = [];
 pointCounter = 0;
@@ -75,10 +77,10 @@ end
 function plotOrigPoints(Building1, Building2, Limits)   
     geoplot(Building1.lat, Building1.lon, '*');
     hold on;
-    geoplot(Building1.lat, Building1.lon, "om", MarkerFaceColor = "m", MarkerSize = 2);
-    geoplot(Building2.lat, Building2.lon, "om", MarkerFaceColor = "m", MarkerSize = 2);
+    geoplot(Building1.lat, Building1.lon, "om", MarkerFaceColor = "m", MarkerSize = 8);
+    geoplot(Building2.lat, Building2.lon, "om", MarkerFaceColor = "m", MarkerSize = 8);
     geolimits(Limits.lat,Limits.lon)
-    geobasemap streets
+    geobasemap satellite
     text(Building1.lat, Building1.lon, Building1.label);
     text(Building2.lat, Building2.lon, Building2.label);
 end
