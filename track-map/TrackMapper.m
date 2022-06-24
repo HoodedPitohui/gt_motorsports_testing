@@ -1,6 +1,7 @@
 %Plot points on a map and then retrieve latitude and longitude coordinates
 clc;
 clear all;
+close all;
 
 %Pick two reference points
 
