@@ -6,23 +6,66 @@ close all;
 im = imread('testMap.jpg');
 imshow(im)
 redPoints = im(:,:,1)>=130 & im(:,:,2)<=60 & im(:,:,3)<=100;
-redCoords = find(redPoints == 1)
-redRows = floor(redCoords / size(redPoints, 1))
-redCols = rem(redCoords, size(redPoints, 2))
+redCoords = find(redPoints == 1);
+
+imRows = size(redPoints, 1);
+imCols = size(redPoints, 2);
+redRows = floor(redCoords / imRows);
+redCols = rem(redCoords, imRows);
+
 
 %set up the looping
 [rowLen, colLen] = size(redPoints);
 i = 1;
 j = 1;
 checkVals = zeros(rowLen, colLen);
+numSpots = 1;
 
 %Goal: find clusters of x and y points that have red, and store them as
 %pages in a 3D array
+%general strategy: check points to the left and top of a given element
 while i <= rowLen
     while j <= colLen
-        if (redPoints(i, j) == 1)
+        %check if a point is red
+        if (redPoints((i - 1) * imCols + j) == 1)
+            %check if it's the first row
+            if (i == 1)
+                %check if it's the first column
+                if (j == 1)
+                    checkVals(i * imCols + j) = numSpots;
+                    numSpots = numSpots + 1;
+                elseif (redPoints((i - 1) * imCols + j - 1) == 1)
+                    checkVals(i, j) = checkVals(i, j - 1);
+                else
+                    checkVals(i, j) = numSpots;
+                    numSpots = numSpots + 1;
+                end
+            else
+                if (j == 1)
+                    if (redPoints((i - 2) * imCols + j) == 1)
+                        checkVals(i, j) = checkVals(i - 1, j);
+                    else
+                        checkVals(i, j) = numSpots;
+                        numSpots = numSpots + 1;
+                    end
+                else
+                    if (redPoints((i - 2) * imCols + j) == 1)
+                        checkVals(i, j) = checkVals(i - 1, j);
+                    elseif (redPoints((i - 1) * imCols + j - 1) == 1)
+                        checkVals(i, j) = checkVals(i, j - 1);
+                    else
+                        checkVals(i, j) = numSpots;
+                        numSpots = numSpots + 1;
+                    end
+                end
+            end
+        end
+        j = j + 1;
     end
-end
+    j = 1;
+    i = i + 1;
+end 
+
 
 % [centers, radii, metric] = imfindcircles(im,[5 14]);
 % centersStrong5 = centers(1:10,:); 
