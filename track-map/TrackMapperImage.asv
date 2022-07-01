@@ -20,7 +20,7 @@ i = 1;
 j = 1;
 checkVals = zeros(rowLen, colLen);
 numSpots = 1;
-pointClusters = {};
+
 %Goal: find clusters of x and y points that have red, and store them as
 %pages in a 3D array
 %general strategy: check points to the left and top of a given element
@@ -37,8 +37,7 @@ while i <= rowLen
                     nRedSpotsPerCluster(length(nRedspotsPerCluster) + 1) = 1;
                     numSpots = numSpots + 1;
                 elseif (redPoints((i - 1) * imCols + j - 1) == 1)
-                    temp = checkVals(i, j - 1);
-                    checkVals(i, j) = temp;
+                    checkVals(i, j) = checkVals(i, j - 1);
                 else
                     checkVals(i, j) = numSpots;
                     nRedSpotsPerCluster(length(nRedspotsPerCluster) + 1) = 1;
@@ -47,26 +46,23 @@ while i <= rowLen
             else
                 if (j == 1)
                     if (redPoints((i - 2) * imCols + j) == 1)
-                        temp = checkVals(i - 1, j);
-                        nRedSpotsPerCluster(temp) = nRedSpotsPerCluster(temp) + 1;
-                        checkVals(i, j) = temp;
+                        checkVals(i, j) = checkVals(i - 1, j);
                     else
                         checkVals(i, j) = numSpots;
-                        nRedSpotsPerCluster(length(nRedSpotsPerCluster) + 1) = 1;
+                        nRedSpotsPerCluster(length(nRedspotsPerCluster) + 1) = 1;
                         numSpots = numSpots + 1;
                     end
                 else
                     if (redPoints((i - 2) * imCols + j) == 1)
-                        temp = checkVals(i - 1, j);
-                        checkVals(i, j) = temp;
-                        nRedSpotsPerCluster(temp) = nRedSpotsPerCluster(temp) + 1;
+                        t
+                        checkVals(i, j) = checkVals(i - 1, j);
+                        nRedSpotsPerCluster(checkVals(
                     elseif (redPoints((i - 1) * imCols + j - 1) == 1)
-                        temp = checkVals(i, j - 1);
-                        checkVals(i, j) = temp;
-                        nRedSpotsPerCluster(temp) = nRedSpotsPerCluster(temp) + 1;
+                        checkVals(i, j) = checkVals(i, j - 1);
+                        nRedSpotsPerCluster(checkVals(i, j - 1)) = nRedSpotsPerCluster(checkVals(i, j - 1)) + 1;
                     else
                         checkVals(i, j) = numSpots;
-                        nRedSpotsPerCluster(length(nRedSpotsPerCluster) + 1) = 1;
+                        nRedSpotsPerCluster(length(nRedspotsPerCluster) + 1) = 1;
                         numSpots = numSpots + 1;
                     end
                 end
