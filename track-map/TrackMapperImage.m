@@ -20,7 +20,7 @@ i = 1;
 j = 1;
 checkVals = zeros(rowLen, colLen);
 numSpots = 1;
-pointClusters = {};
+pointClusters = [];
 %Goal: find clusters of x and y points that have red, and store them as
 %pages in a 3D array
 %general strategy: check points to the left and top of a given element
@@ -33,41 +33,34 @@ while i <= rowLen
             if (i == 1)
                 %check if it's the first column
                 if (j == 1)
-                    checkVals(i * imCols + j) = numSpots;
-                    nRedSpotsPerCluster(length(nRedspotsPerCluster) + 1) = 1;
-                    numSpots = numSpots + 1;
+                    [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
+                        addCluster(checkVals, nRedSpotsPerCluster, pointClusters, numSpots, i, j);
                 elseif (redPoints((i - 1) * imCols + j - 1) == 1)
-                    temp = checkVals(i, j - 1);
-                    checkVals(i, j) = temp;
+                    [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                        addToClusterLeft(checkVals, nRedSpotsPerCluster, pointClusters, i, j);
                 else
-                    checkVals(i, j) = numSpots;
-                    nRedSpotsPerCluster(length(nRedspotsPerCluster) + 1) = 1;
-                    numSpots = numSpots + 1;
+                    [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
+                        addCluster(checkVals, nRedSpotsPerCluster, pointClusters, numSpots, i, j);
                 end
             else
                 if (j == 1)
                     if (redPoints((i - 2) * imCols + j) == 1)
-                        temp = checkVals(i - 1, j);
-                        nRedSpotsPerCluster(temp) = nRedSpotsPerCluster(temp) + 1;
-                        checkVals(i, j) = temp;
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToClusterTop(checkVals, nRedSpotsPerCluster, pointClusters, i, j);    
                     else
-                        checkVals(i, j) = numSpots;
-                        nRedSpotsPerCluster(length(nRedSpotsPerCluster) + 1) = 1;
-                        numSpots = numSpots + 1;
+                        [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
+                            addCluster(checkVals, nRedSpotsPerCluster, pointClusters, numSpots, i, j);
                     end
                 else
                     if (redPoints((i - 2) * imCols + j) == 1)
-                        temp = checkVals(i - 1, j);
-                        checkVals(i, j) = temp;
-                        nRedSpotsPerCluster(temp) = nRedSpotsPerCluster(temp) + 1;
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToClusterTop(checkVals, nRedSpotsPerCluster, pointClusters, i, j);                        
                     elseif (redPoints((i - 1) * imCols + j - 1) == 1)
-                        temp = checkVals(i, j - 1);
-                        checkVals(i, j) = temp;
-                        nRedSpotsPerCluster(temp) = nRedSpotsPerCluster(temp) + 1;
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToClusterLeft(checkVals, nRedSpotsPerCluster, pointClusters, i, j);
                     else
-                        checkVals(i, j) = numSpots;
-                        nRedSpotsPerCluster(length(nRedSpotsPerCluster) + 1) = 1;
-                        numSpots = numSpots + 1;
+                        [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
+                            addCluster(checkVals, nRedSpotsPerCluster, pointClusters, numSpots, i, j);
                     end
                 end
             end
@@ -76,11 +69,54 @@ while i <= rowLen
     end
     j = 1;
     i = i + 1;
-end 
+end
 
 
-% [centers, radii, metric] = imfindcircles(im,[5 14]);
-% centersStrong5 = centers(1:10,:); 
-% radiiStrong5 = radii(1:10);
-% metricStrong5 = metric(1:10);
-% viscircles(centersStrong5, radiiStrong5,'EdgeColor','b');
+%Normalize the points so they are how they actually will be represented on
+%an image, per: https://www.mathworks.com/matlabcentral/answers/269694-how-to-plot-some-points-on-an-image
+%This means that we essentially have to subtract all of our y-coordinates
+%by 912, and then take the absolute value of that
+
+for i = 1: length(nRedSpotsPerCluster')
+    for j = 1: length(pointClusters(:, 1, i))
+        pointClusters(j, 2, i) = abs(pointClusters(j, 2, i) - imRows); %should be an abs but the graph won't plot like that
+    end
+end
+
+%create new graph
+figure;
+hold on;
+sz = 2;
+xlim([0 imCols]);
+ylim([0 imRows]);
+for i = 1: length(nRedSpotsPerCluster')
+    for j = 1: length(pointClusters(:, 1, i))
+        scatter(pointClusters(j, 1, i), pointClusters(j, 2, i), sz, 'filled');
+    end
+end
+
+%functions to streamline the adding of points to respective arrays
+function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+    addToClusterTop(checkVals, nRedSpotsPerCluster, pointClusters, i, j)
+    temp = checkVals(i - 1, j);
+    checkVals(i, j) = temp;
+    nRedSpotsPerCluster(temp) = nRedSpotsPerCluster(temp) + 1;
+    pointClusters(nRedSpotsPerCluster(temp), :, temp) = [i, j];
+end
+
+function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+    addToClusterLeft(checkVals, nRedSpotsPerCluster, pointClusters, i, j)
+    temp = checkVals(i, j - 1);
+    checkVals(i, j) = temp;
+    nRedSpotsPerCluster(temp) = nRedSpotsPerCluster(temp) + 1;
+    pointClusters(nRedSpotsPerCluster(temp), :, temp) = [i, j];
+end
+
+
+function [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
+    addCluster(checkVals, nRedSpotsPerCluster, pointClusters, numSpots, i, j)
+    checkVals(i, j) = numSpots;
+    nRedSpotsPerCluster(length(nRedSpotsPerCluster) + 1) = 1;
+    pointClusters(1, :, numSpots) = [i, j];
+    numSpots = numSpots + 1;
+end
