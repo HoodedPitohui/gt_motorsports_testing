@@ -8,11 +8,17 @@ imshow(im)
 redPoints = im(:,:,1)>=130 & im(:,:,2)<=60 & im(:,:,3)<=100;
 redCoords = find(redPoints == 1);
 
+
 imRows = size(redPoints, 1);
 imCols = size(redPoints, 2);
 redRows = floor(redCoords / imRows);
 redCols = rem(redCoords, imRows);
-
+figure;
+hold on;
+redCols = -1 .* redCols;
+for i = 1: length(redRows)
+    scatter(redRows(i), redCols(i))
+end
 
 %set up the looping
 [rowLen, colLen] = size(redPoints);
