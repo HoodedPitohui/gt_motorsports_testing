@@ -74,10 +74,9 @@ while (i < 0)
                             addLeftPoint(nRedSpotsPerCluster, pointClusters, ...
                             redMat, i, j);
                     else
-                        [nRedSpotsPerCluster, pointClusters, redMat, numSpots] = ...
+                                                [nRedSpotsPerCluster, pointClusters, redMat, numSpots] = ...
                             addNewCluster(nRedSpotsPerCluster, pointClusters, ...
                             redMat, numSpots, i, j);
-                    end
                 end    
             end
         end
@@ -107,7 +106,7 @@ end
 function [index] = findPairIndex(pair, givenMatrix)
     i = 1;
     isMatch = 0;
-    while (i <= size(givenMatrix, 1) && isMatch == 0)
+    while (i <= Size(givenMatrix, 1) && isMatch == 0)
         if (pair(1) == givenMatrix(i, 1))
             if (pair(2) == givenMatrix(i, 2))
                 isMatch = 1;
@@ -123,7 +122,7 @@ end
 function [isMatch] = findPairMatrix(pair, givenMatrix)
     i = 1;
     isMatch = 0;
-    while (i <= size(givenMatrix, 1) && isMatch == 0)
+    while (i <= Size(givenMatrix, 1) && isMatch == 0)
         if (pair(1) == givenMatrix(i, 1))
             if (pair(2) == givenMatrix(i, 2))
                 isMatch = 1;
