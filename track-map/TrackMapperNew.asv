@@ -22,17 +22,24 @@ redY2 = -1 .* redY;
 
 %set up the looping
 [rowLen, colLen] = size(redPoints);
-i = imRows;
-j = 1;
-checkVals = zeros(rowLen, colLen);
-numSpots = 1;
-pointClusters = [];
+
 %Goal: find clusters of x and y points that have red, and store them as
 %pages in a 3D array
 %general strategy: check points to the left and top of a given element
 nRedSpotsPerCluster = [];
 redMat = zeros(rowLen, colLen);
-redMat(redY, redX) = 1;
+
+for i = 1: length(redY)
+    redMat(redY(i), redX(i)) = 1;
+end
+
+
+i = imRows;
+j = 1;
+checkVals = zeros(rowLen, colLen);
+numSpots = 1;
+pointClusters = [];
+
 while i > 0
     while j <= colLen
         %check if a point is red
@@ -79,15 +86,18 @@ while i > 0
     i = i - 1;
 end
 
+pointClusters(:, 2, :) = pointClusters(:, 2, :) - imRows;
+pointClSize = size(pointClusters);
 
-%Normalize the points so they are how they actually will be represented on
-%an image, per: https://www.mathworks.com/matlabcentral/answers/269694-how-to-plot-some-points-on-an-image
-%This means that we essentially have to subtract all of our y-coordinates
-%by 912, and then take the absolute value of that
+for i = 1: pointClSize(3)
+    while (j <= pointClSize(2) && pointClusters(j, 1, i) ~= 0)
+        
+        j = j + 1;
+    end
+    j = 1;
+end
 
-% for i = 1: length(redX)
-%     scatter(redX(i), redY2(i))
-% end
+
 %functions to streamline the adding of points to respective arrays
 function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
     addToClusterTop(checkVals, nRedSpotsPerCluster, pointClusters, i, j)

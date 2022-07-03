@@ -16,23 +16,30 @@ redY = rem(redCoords, imRows);
 figure;
 hold on;
 redY2 = -1 .* redY;
-% for i = 1: length(redX)
-%     scatter(redX(i), redY2(i))
-% end
+for i = 1: length(redX)
+    scatter(redX(i), redY2(i))
+end
 
 %set up the looping
 [rowLen, colLen] = size(redPoints);
-i = imRows;
-j = 1;
-checkVals = zeros(rowLen, colLen);
-numSpots = 1;
-pointClusters = [];
+
 %Goal: find clusters of x and y points that have red, and store them as
 %pages in a 3D array
 %general strategy: check points to the left and top of a given element
 nRedSpotsPerCluster = [];
 redMat = zeros(rowLen, colLen);
-redMat(redY, redX) = 1;
+
+for i = 1: length(redY)
+    redMat(redY(i), redX(i)) = 1;
+end
+
+
+i = imRows;
+j = 1;
+checkVals = zeros(rowLen, colLen);
+numSpots = 1;
+pointClusters = [];
+
 while i > 0
     while j <= colLen
         %check if a point is red
@@ -78,11 +85,20 @@ while i > 0
     j = 1;
     i = i - 1;
 end
+
+pointClusters(:, 1, :) = -1 .* pointClusters(:, 1, :);
+pointClSize = size(pointClusters);
+
 figure;
 hold on;
-pointClusters2(:, 1, :) - imRows;
-for i = 1: 220
-    for j = 1: 304
+pointsPlotted = 0;
+for i = 1: pointClSize(3)
+    while (j <= pointClSize(1) && pointClusters(j, 2, i) ~= 0)
+        scatter(pointClusters(j, 2, i), pointClusters(j, 1, i));
+        j = j + 1;
+        pointsPlotted = pointsPlotted + 1;
+    end
+    j = 1;
 end
 
 
