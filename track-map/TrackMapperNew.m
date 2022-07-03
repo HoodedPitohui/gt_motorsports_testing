@@ -11,18 +11,18 @@ redCoords = find(redPoints == 1);
 
 imRows = size(redPoints, 1);
 imCols = size(redPoints, 2);
-redRows = floor(redCoords / imRows);
-redCols = rem(redCoords, imRows);
+redX = floor(redCoords / imRows);
+redY = rem(redCoords, imRows);
 figure;
 hold on;
-redCols = -1 .* redCols;
-for i = 1: length(redRows)
-    scatter(redRows(i), redCols(i))
-end
+redY2 = -1 .* redY;
+% for i = 1: length(redX)
+%     scatter(redX(i), redY2(i))
+% end
 
 %set up the looping
 [rowLen, colLen] = size(redPoints);
-i = 1;
+i = imRows;
 j = 1;
 checkVals = zeros(rowLen, colLen);
 numSpots = 1;
@@ -31,12 +31,14 @@ pointClusters = [];
 %pages in a 3D array
 %general strategy: check points to the left and top of a given element
 nRedSpotsPerCluster = [];
-while i <= rowLen
+redMat = zeros(rowLen, colLen);
+redMat(redY, redX) = 1;
+while i > 0
     while j <= colLen
         %check if a point is red
-        if (redPoints((i - 1) * imCols + j) == 1)
+        if (redMat(i, j) == 1)
             %check if it's the first row
-            if (i == 1)
+            if (i == imRows)
                 %check if it's the first column
                 if (j == 1)
                     [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
@@ -74,7 +76,7 @@ while i <= rowLen
         j = j + 1;
     end
     j = 1;
-    i = i + 1;
+    i = i - 1;
 end
 
 
