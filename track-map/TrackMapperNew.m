@@ -94,6 +94,7 @@ while i > 0
     i = i - 1;
 end
 
+%% Post-Processing
 %Converts the points into a way that is correctly displayed. This will be
 %how we will handle the points to find centers and latitude/longitude coordinates
 pointClusters2 = pointClusters;
@@ -102,10 +103,11 @@ pointClSize = size(pointClusters);
 
 %Another progress-checking graph, feel free to comment out/leave in as
 %needed
+
+j = 1;
 figure;
 hold on;
 pointsPlotted = 0;
-j = 1;
 for i = 1: pointClSize(3)
     while (j <= pointClSize(1) && pointClusters(j, 2, i) ~= 0)
         scatter(pointClusters2(j, 2, i), pointClusters2(j, 1, i));
@@ -115,18 +117,27 @@ for i = 1: pointClSize(3)
     j = 1;
 end
 
+%% Finding the center point
 %find the distance matrix of the red clusters
-for i = 1: length(centers)
-    numNonZero = sum(pointClusters(:, :, i) ~= 0);
+centers = {};
+dists = {};
+for i = 1: pointClSize(3)
+    numNonZero = sum(pointClusters2(:, :, i) ~= 0);
     dists{i} = zeros(numNonZero(1), numNonZero(1));
-    dists{i} = calculateDistMatrix(pointClusters(1: numNonZero, :, i), ...
+    dists{i} = calculateDistMatrix(pointClusters2(1: numNonZero, :, i), ...
         dists{i});
+    centers{i} = calcCenterPoint(pointClusters2(1: numNonZero, :, i), ...
+        dists{i}, numNonZero);
 end
 
-centers = zeros(pointClSize(3), 2);
+figure;
+hold on;
+for i = 1: pointClSize(3)
+    point = centers{i};
+    scatter(point(2), point(1));
+end
 
-
-%functions for manipulating point clusters
+%% Supplementary functions
 %add to cluster in above point
 function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
     addToClusterTop(checkVals, nRedSpotsPerCluster, pointClusters, i, j)
@@ -152,6 +163,16 @@ function [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
     nRedSpotsPerCluster(length(nRedSpotsPerCluster) + 1) = 1;
     pointClusters(1, :, numSpots) = [i, j];
     numSpots = numSpots + 1;
+end
+
+%find centerpoint function
+function [centerPoint] = calcCenterPoint(pointMatrix, distMatrix, numRows)
+    if (numRows <= 2)
+        centerPoint = pointMatrix(1, :);
+    else
+        meanDists = (mean(distMatrix))';
+        centerPoint = pointMatrix(find(min(meanDists)), :);
+    end
 end
 
 %distance matrix functions
