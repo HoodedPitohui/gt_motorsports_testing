@@ -2,46 +2,56 @@ clc;
 clear all;
 close all;
 
-%load the image and find its red point indices
+%% Load the image and find its red point indices, identify basic characteristics
 im = imread('testMap.jpg');
 imshow(im)
-redPoints = im(:,:,1)>=130 & im(:,:,2)<=60 & im(:,:,3)<=100;
+redPoints = im(:,:,1)>=130 & im(:,:,2)<=60 & im(:,:,3)<=100; %rgbs for red
 redCoords = find(redPoints == 1);
-
-
 imRows = size(redPoints, 1);
 imCols = size(redPoints, 2);
+
+%find the red x-coordinates, this gets weird, as I found it easy to handle
+%if I flipped the x- and y- coordinates, and then reversed the flip later
 redX = floor(redCoords / imRows);
 redY = rem(redCoords, imRows);
-figure;
-hold on;
-redY2 = -1 .* redY;
+
+%uncomment the below code for troubleshooting, it prints a verifiable map of
+%all the red points
+% figure;
+% hold on;
+% redY2 = -1 .* redY;
 % for i = 1: length(redX)
 %     scatter(redX(i), redY2(i))
 % end
 
-%set up the looping
-[rowLen, colLen] = size(redPoints);
-
-%Goal: find clusters of x and y points that have red, and store them as
-%pages in a 3D array
-%general strategy: check points to the left and top of a given element
+%I found it easier to set up the whole sorting and point finding if I
+%enabled for the red points to be mapped as they would in a matrix, as
+%opposed to an image
 nRedSpotsPerCluster = [];
-redMat = zeros(rowLen, colLen);
-
+redMat = zeros(imRows, imCols);
 for i = 1: length(redY)
     redMat(redY(i), redX(i)) = 1;
 end
 
+%% Setting up the loop
 
+%The objective of the following code is to find the clusters of red and
+%store it in a matrix, this will enable for it to be possible to find the
+%centers of groups of red points. 
+%The default red circle finder in MATLAB was tested earlier, and doesn't
+%work, as the points are too small.
 i = imRows;
-j = 1;
-checkVals = zeros(rowLen, colLen);
 numSpots = 1;
 pointClusters = [];
 
+%The below matrix will eventually fill every red point with an integer
+%value, indicating the cluster the point belongs to
+checkVals = zeros(imRows, imCols);
+
+%The following code basically starts at the top left of an image, and then
+%finds clusters by checking every point to the left and top of it
 while i > 0
-    while j <= colLen
+    for j = 1: imCols
         %check if a point is red
         if (redMat(i, j) == 1)
             %check if it's the first row
@@ -80,25 +90,41 @@ while i > 0
                 end
             end
         end
-        j = j + 1;
     end
-    j = 1;
     i = i - 1;
 end
 
-pointClusters(:, 2, :) = pointClusters(:, 2, :) - imRows;
+%Converts the points into a way that is correctly displayed. This will be
+%how we will handle the points to find centers and latitude/longitude coordinates
+pointClusters2 = pointClusters;
+pointClusters2(:, 1, :) = -1 .* pointClusters2(:, 1, :);
 pointClSize = size(pointClusters);
 
+%Another progress-checking graph, feel free to comment out/leave in as
+%needed
+figure;
+hold on;
+pointsPlotted = 0;
 for i = 1: pointClSize(3)
-    while (j <= pointClSize(2) && pointClusters(j, 1, i) ~= 0)
-        
+    while (j <= pointClSize(1) && pointClusters(j, 2, i) ~= 0)
+        scatter(pointClusters2(j, 2, i), pointClusters2(j, 1, i));
         j = j + 1;
+        pointsPlotted = pointsPlotted + 1;
     end
     j = 1;
 end
 
+%find the centers of the circles
+centers = zeros(pointClSize(3), 2);
+for i = 1: length(centers)
+    numNonZero = sum(pointClusters(:, :, i) ~= 0);
+    dists = zeros(numNonZero(1), numNonZero(1));
+    dists = calculateDistMatrix(pointClusters(:, :, i), dists);
+end
 
-%functions to streamline the adding of points to respective arrays
+
+%functions for manipulating point clusters
+%add to cluster in above point
 function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
     addToClusterTop(checkVals, nRedSpotsPerCluster, pointClusters, i, j)
     temp = checkVals(i + 1, j);
@@ -107,6 +133,7 @@ function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
     pointClusters(nRedSpotsPerCluster(temp), :, temp) = [i, j];
 end
 
+%add to cluster in left point
 function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
     addToClusterLeft(checkVals, nRedSpotsPerCluster, pointClusters, i, j)
     temp = checkVals(i, j - 1);
@@ -115,11 +142,25 @@ function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
     pointClusters(nRedSpotsPerCluster(temp), :, temp) = [i, j];
 end
 
-
+%create new cluster
 function [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
     addCluster(checkVals, nRedSpotsPerCluster, pointClusters, numSpots, i, j)
     checkVals(i, j) = numSpots;
     nRedSpotsPerCluster(length(nRedSpotsPerCluster) + 1) = 1;
     pointClusters(1, :, numSpots) = [i, j];
     numSpots = numSpots + 1;
+end
+
+%auxiliary functions
+function [distMatrix] = calculateDistMatrix(pointMatrix, distMatrix)
+    for i = 1: length(distMatrix)
+        j = length(distMatrix);
+        while (distMatrix(j) == 0 && pointMatrix(j, 1) )
+            distMatrix(i, j) = calculateDists(pointMatrix(i, :), pointMatrix(j));
+            distMatrix(j, i) = distMatrix(i, j);
+        end
+    end
+end
+function [dist] = calculateDists(point1, point2)
+    dist = sqrt((point2(2) - point1(2))^2 + (point2(1) - point1(1))^2);
 end
