@@ -165,16 +165,7 @@ writematrix(combinedMat, filename, 'Sheet', 1);
 function [temp] = getTempVal(keyWord)
     if (keyWord == 'left1')
     elseif (keyWord == 'left2')
-    elseif (keyWord == 'left1top1')
-    elseif (keyWord == 'left2top1')
-    elseif (keyWord == 'left2top2')
-    elseif (keyWord == 'left1top2')
-    elseif (keyWord == 'top1')
-    elseif (keyWord == 'top2')
-    elseif (keyWord == 'right1top1')
-    elseif (keyWord == 'right1top2')
-    else %this is right2 top2, otherwise this won't be triggered
-    end
+    elseif (keyWord == 
 end
 function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
     addToClusterTop(checkVals, nRedSpotsPerCluster, pointClusters, i, j)

@@ -75,7 +75,9 @@ function [coneLatCoords, coneLonCoords, outPlot] = plotUserPoint(pointCounter, c
 end
 
 %Plot base points
-function plotOrigPoints(Building1, Building2, Limits)   
+function plotOrigPoints(Building1, Building2, Limits) 
+    gx = geoaxes;
+    gx.Grid = 'on';
     geoplot(Building1.lat, Building1.lon, '*');
     hold on;
     geoplot(Building1.lat, Building1.lon, "om", MarkerFaceColor = "m", MarkerSize = 8);
