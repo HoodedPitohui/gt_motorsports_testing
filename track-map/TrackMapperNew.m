@@ -62,7 +62,7 @@ while i > 0
                         addCluster(checkVals, nRedSpotsPerCluster, pointClusters, numSpots, i, j);
                 elseif (redMat(i, j - 1) == 1)
                     [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
-                        addToClusterLeft(checkVals, nRedSpotsPerCluster, pointClusters, i, j);
+                        addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'left1');
                 else
                     [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
                         addCluster(checkVals, nRedSpotsPerCluster, pointClusters, numSpots, i, j);
@@ -71,24 +71,63 @@ while i > 0
                 if (j == 1)
                     if (redMat(i + 1, j) == 1)
                         [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
-                            addToClusterTop(checkVals, nRedSpotsPerCluster, pointClusters, i, j);    
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'top1');
+                    elseif (redMat(i + 1, j + 1) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'right1top1');
+                    elseif (i + 1 < imRows && redMat(i + 2, j) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'top2');
+                    elseif (i + 1 < imRows && redMat(i + 2, j + 1) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'right1top2');
+                    elseif (i + 1 < imRows && redMat(i + 2, j + 2) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'right2top2'); 
+                    elseif (redMat(i + 1, j + 2) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, ' '); 
                     else
                         [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
                             addCluster(checkVals, nRedSpotsPerCluster, pointClusters, numSpots, i, j);
                     end
                 else
-                    if (redMat(i + 1, j) == 1)
+                    if (redMat(i, j - 1) == 1)
                         [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
-                            addToClusterTop(checkVals, nRedSpotsPerCluster, pointClusters, i, j);
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'left1');
+                    elseif (j - 1 > 1 && redMat(i, j - 2) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'left2');
                     elseif (redMat(i + 1, j - 1) == 1)
                         [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
-                            addToClusterTopLeft(checkVals, nRedSpotsPerCluster, pointClusters, i, j);
-                    elseif (j ~= imCols && redMat(i + 1, j + 1) == 1)
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'left1top1');
+                    elseif (j - 1 > 1 && redMat(i + 1, j - 2) == 1)
                         [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
-                            addToClusterTopRight(checkVals, nRedSpotsPerCluster, pointClusters, i, j);
-                    elseif (redMat(i, j - 1) == 1)
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'left2top1');
+                    elseif (j - 1 > 1 && i + 1 < imRows && redMat(i + 2, j - 2) == 1)
                         [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
-                            addToClusterLeft(checkVals, nRedSpotsPerCluster, pointClusters, i, j);
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'left2top2');
+                    elseif (i + 1 < imRows && redMat(i + 2, j - 1) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'left1top2');
+                    elseif (redMat(i + 1, j) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'top1');
+                    elseif (i + 1 < imRows && redMat(i + 2, j) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'top2');
+                    elseif (j < imCols && redMat(i + 1, j + 1) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'right1top1');
+                    elseif (j < imCols && i + 1 < imRows && redMat(i + 2, j + 1) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'right1top2');
+                    elseif (j + 1 < imCols && redMat(i + 2, j + 2) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, 'right2top2');
+                    elseif (j + 1 < imCols && redMat(i + 1, j + 2) == 1)
+                        [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
+                            addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, ' ');
                     else
                         [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
                             addCluster(checkVals, nRedSpotsPerCluster, pointClusters, numSpots, i, j);
@@ -162,53 +201,41 @@ combinedMat = [cell2mat(centerLats); cell2mat(centerLongs)];
 writematrix(combinedMat, filename, 'Sheet', 1);
 %% Supplementary functions
 %add to cluster in above point
-function [temp] = getTempVal(keyWord)
-    if (keyWord == 'left1')
-    elseif (keyWord == 'left2')
-    elseif (keyWord == 'left1top1')
-    elseif (keyWord == 'left2top1')
-    elseif (keyWord == 'left2top2')
-    elseif (keyWord == 'left1top2')
-    elseif (keyWord == 'top1')
-    elseif (keyWord == 'top2')
-    elseif (keyWord == 'right1top1')
-    elseif (keyWord == 'right1top2')
-    else %this is right2 top2, otherwise this won't be triggered
+function [temp] = getTempVal(keyWord, checkVals, i, j)
+    if (strcmp(keyWord, 'left1'))
+        temp = checkVals(i, j - 1);
+    elseif (strcmp(keyWord, 'left2'))
+        temp = checkVals(i, j - 2);
+    elseif (strcmp(keyWord, 'left1top1'))
+        temp = checkVals(i + 1, j - 1);
+    elseif (strcmp(keyWord, 'left2top1'))
+        temp = checkVals(i + 1, j - 2);
+    elseif (strcmp(keyWord, 'left2top2'))
+        temp = checkVals(i + 2, j - 2);
+    elseif (strcmp(keyWord, 'left1top2'))
+        temp = checkVals(i + 2, j - 1);
+    elseif (strcmp(keyWord, 'top1'))
+        temp = checkVals(i + 1, j);
+    elseif (strcmp(keyWord, 'top2'))
+        temp = checkVals(i + 2, j);
+    elseif (strcmp(keyWord, 'right1top1'))
+        temp = checkVals(i + 1, j + 1);
+    elseif (strcmp(keyWord, 'right1top2'))
+        temp = checkVals(i + 2, j + 1);
+    elseif (strcmp(keyWord, 'right2top2'))
+        temp = checkVals(i + 2, j + 2);
+    else %right 2 top 1
+        temp = checkVals(i + 1, j + 2);
     end
 end
 function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
-    addToClusterTop(checkVals, nRedSpotsPerCluster, pointClusters, i, j)
-    temp = checkVals(i + 1, j);
+    addToCluster(checkVals, nRedSpotsPerCluster, pointClusters, i, j, keyWord)
+    temp = getTempVal(keyWord, checkVals, i, j);
     checkVals(i, j) = temp;
     nRedSpotsPerCluster(temp) = nRedSpotsPerCluster(temp) + 1;
     pointClusters(nRedSpotsPerCluster(temp), :, temp) = [i, j];
 end
 
-function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
-    addToClusterTopLeft(checkVals, nRedSpotsPerCluster, pointClusters, i, j)
-    temp = checkVals(i + 1, j - 1);
-    checkVals(i, j) = temp;
-    nRedSpotsPerCluster(temp) = nRedSpotsPerCluster(temp) + 1;
-    pointClusters(nRedSpotsPerCluster(temp), :, temp) = [i, j];
-end
-
-
-function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
-    addToClusterTopRight(checkVals, nRedSpotsPerCluster, pointClusters, i, j)
-    temp = checkVals(i + 1, j + 1);
-    checkVals(i, j) = temp;
-    nRedSpotsPerCluster(temp) = nRedSpotsPerCluster(temp) + 1;
-    pointClusters(nRedSpotsPerCluster(temp), :, temp) = [i, j];
-end
-
-%add to cluster in left point
-function [temp, checkVals, nRedSpotsPerCluster, pointClusters] = ...
-    addToClusterLeft(checkVals, nRedSpotsPerCluster, pointClusters, i, j)
-    temp = checkVals(i, j - 1);
-    checkVals(i, j) = temp;
-    nRedSpotsPerCluster(temp) = nRedSpotsPerCluster(temp) + 1;
-    pointClusters(nRedSpotsPerCluster(temp), :, temp) = [i, j];
-end
 
 %create new cluster
 function [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
