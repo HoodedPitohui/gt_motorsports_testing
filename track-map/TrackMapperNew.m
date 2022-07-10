@@ -3,6 +3,7 @@ clear all;
 close all;
 
 %% Load the image and find its red point indices, identify basic characteristics
+outputFileName = 'ConePositions.xlsx';
 im = imread('test45.4.jpg');
 imshow(im)
 redPoints = im(:,:,1)>=130 & im(:,:,2)<=60 & im(:,:,3)<=100; %rgbs for red
@@ -150,17 +151,19 @@ pointClSize = size(pointClusters);
 %needed
 
 j = 1;
-figure;
-hold on;
-pointsPlotted = 0;
-for i = 1: pointClSize(3)
-    while (j <= pointClSize(1) && pointClusters(j, 2, i) ~= 0)
-        scatter(pointClusters2(j, 2, i), pointClusters2(j, 1, i));
-        j = j + 1;
-        pointsPlotted = pointsPlotted + 1;
-    end
-    j = 1;
-end
+%figure
+% imshow(im)
+% hold on;
+% pointsPlotted = 0;
+% for i = 1: pointClSize(3)
+%     while (j <= pointClSize(1) && pointClusters(j, 2, i) ~= 0)
+%         scatter(pointClusters2(j, 2, i), pointClusters(j, 1, i));
+%         j = j + 1;
+%         pointsPlotted = pointsPlotted + 1;
+%     end
+%     j = 1;
+% end
+% title("Found Red Points Plotted Over Image Red Points (Verification");
 
 %% Finding the center point
 %find the distance matrix of the red clusters
@@ -175,11 +178,12 @@ for i = 1: pointClSize(3)
         dists{i}, numNonZero);
 end
 
-figure;
+%figure;
+imshow(im);
 hold on;
 for i = 1: pointClSize(3)
     point = centers{i};
-    scatter(point(2), point(1));
+    scatter(point(2), point(1) * (-1), 'filled');
 end
 
 %% Use these for latitude/longitude calculations
@@ -196,9 +200,19 @@ for i = 1: length(centers)
     centerLats{i} = centers{i}(2) / imCols * diffLat + botLat;
     centerLongs{i} = abs(centers{i}(1)) / imRows * diffLong + leftLong;
 end
-filename = 'ConePositions.xlsx';
-combinedMat = [cell2mat(centerLats); cell2mat(centerLongs)];
-writematrix(combinedMat, filename, 'Sheet', 1);
+combinedMat = [cell2mat(centerLats'), cell2mat(centerLongs')];
+
+%% Group the data into how many the user wants and output
+numGroups = int16(input("Please enter how many groups of data you want"));
+numPerGroup = floor(length(centerLats) / numGroups);
+numRem = rem(centerLats, numGroups);
+groupedPoints = {};
+% for i = 1: numGroups
+%     if (i <= numRem)
+%         for j = 1: numPerGroup
+%             groupedPoints
+
+writematrix(combinedMat, outputFileName, 'Sheet', 1);
 %% Supplementary functions
 %add to cluster in above point
 function [temp] = getTempVal(keyWord, checkVals, i, j)
