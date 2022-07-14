@@ -4,9 +4,20 @@ close all;
 
 %% Load the image and find its red point indices, identify basic characteristics
 outputFileName = 'ConePositions.xlsx';
-im = imread('test45.4.jpg');
+im = imread('testMap1.jpg');
 imshow(im)
-redPoints = im(:,:,1)>=130 & im(:,:,2)<=60 & im(:,:,3)<=100; %rgbs for red
+redPoints = (im(:,:,1)>=130 & im(:,:,2)<=60 & im(:,:,3)<=100) | ...
+    (im(:, :, 1) == 255 & im(:, :, 2) == 250 & im(:, :, 3) == 250) | ...
+    (im(:, :, 1) == 244 & im(:, :, 2) == 194 & im(:, :, 3) == 194) | ...
+    (im(:, :, 1) == 255 & im(:, :, 2) == 105 & im(:, :, 3) == 97) | ...
+    (im(:, :, 1) == 255 & im(:, :, 2) == 92 & im(:, :, 3) == 92) | ...
+    (im(:, :, 1) == 205 & im(:, :, 2) == 92 & im(:, :, 3) == 92) | ...
+    (im(:, :, 1) == 227 & im(:, :, 2) == 66 & im(:, :, 3) == 52) | ...
+    (im(:, :, 1) == 128 & im(:, :, 2) == 0 & im(:, :, 3) == 0) | ...
+    (im(:, :, 1) == 112 & im(:, :, 2) == 28 & im(:, :, 3) == 28) | ...
+    (im(:, :, 1) == 60 & im(:, :, 2) == 20 & im(:, :, 3) == 20) | ...
+    (im(:, :, 1) == 50 & im(:, :, 2) == 20 & im(:, :, 3) == 20); %rgbs for red
+%http://www.workwithcolor.com/red-color-hue-range-01.htm
 redCoords = find(redPoints == 1);
 imRows = size(redPoints, 1);
 imCols = size(redPoints, 2);
@@ -157,7 +168,7 @@ j = 1;
 % pointsPlotted = 0;
 % for i = 1: pointClSize(3)
 %     while (j <= pointClSize(1) && pointClusters(j, 2, i) ~= 0)
-%         scatter(pointClusters2(j, 2, i), pointClusters(j, 1, i));
+%         scatter(pointClusters2(j, 2, i), pointClusters(j, 1, i), 'filled');
 %         j = j + 1;
 %         pointsPlotted = pointsPlotted + 1;
 %     end
@@ -168,14 +179,9 @@ j = 1;
 %% Finding the center point
 %find the distance matrix of the red clusters
 centers = {};
-dists = {};
 for i = 1: pointClSize(3)
     numNonZero = sum(pointClusters2(:, :, i) ~= 0);
-    dists{i} = zeros(numNonZero(1), numNonZero(1));
-    dists{i} = calculateDistMatrix(pointClusters2(1: numNonZero, :, i), ...
-        dists{i});
-    centers{i} = calcCenterPoint(pointClusters2(1: numNonZero, :, i), ...
-        dists{i}, numNonZero);
+    centers{i} = calcCenterPoint(pointClusters2(1: numNonZero, :, i), numNonZero);
 end
 
 %figure;
@@ -281,26 +287,14 @@ function [checkVals, nRedSpotsPerCluster, pointClusters, numSpots] = ...
 end
 
 %find centerpoint function
-function [centerPoint] = calcCenterPoint(pointMatrix, distMatrix, numRows)
+function [centerPoint] = calcCenterPoint(pointMatrix, numRows)
     if (numRows <= 2)
         centerPoint = pointMatrix(1, :);
     else
-        meanDists = (mean(distMatrix))';
-        centerPoint = pointMatrix(find(min(meanDists)), :);
+        minY = min(pointMatrix(:, 1));
+        maxY = max(pointMatrix(:, 1));
+        minX = min(pointMatrix(:, 2));
+        maxX = max(pointMatrix(:, 2));
+        centerPoint = [(maxY + minY) / 2, (maxX + minX) / 2];
     end
-end
-
-%distance matrix functions
-function [distMatrix] = calculateDistMatrix(pointMatrix, distMatrix)
-    for i = 1: length(distMatrix)
-        j = length(distMatrix);
-        while (j > i)
-            distMatrix(i, j) = calculateDists(pointMatrix(i, :), pointMatrix(j, :));
-            distMatrix(j, i) = distMatrix(i, j);
-            j = j - 1;
-        end
-    end
-end
-function [dist] = calculateDists(point1, point2)
-    dist = sqrt((point2(2) - point1(2))^2 + (point2(1) - point1(1))^2);
 end
