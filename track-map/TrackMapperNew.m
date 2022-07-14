@@ -203,16 +203,36 @@ end
 combinedMat = [cell2mat(centerLats'), cell2mat(centerLongs')];
 
 %% Group the data into how many the user wants and output
-numGroups = int16(input("Please enter how many groups of data you want"));
+numGroups = input("Please enter how many groups of data you want: ");
 numPerGroup = floor(length(centerLats) / numGroups);
-numRem = rem(centerLats, numGroups);
-groupedPoints = {};
-% for i = 1: numGroups
-%     if (i <= numRem)
-%         for j = 1: numPerGroup
-%             groupedPoints
+numRem = rem(length(centerLats), numGroups);
+groupedPoints = sortrows(combinedMat, 1);
+groupedVals = {};
+pointCounter = 1;
+for i = 1: numGroups
+    if (i <= numRem)
+        tempMat = [];
+        for j = 1: numPerGroup + 1
+            tempMat(j, :) = groupedPoints(pointCounter, :);
+            pointCounter = pointCounter + 1;
+        end
+        groupedVals{i} = tempMat;
+    else
+        tempMat = [];
+        for j = 1: numPerGroup
+            tempMat(j, :) = groupedPoints(pointCounter, :);
+            pointCounter = pointCounter + 1;
+        end
+        groupedVals{i} = tempMat;
+    end
+end
+delete(outputFileName);
+%writecell(groupedVals, outputFileName, 'Sheet', 1);
+for i = 1: numGroups
+    coords1 = cell2mat(groupedVals(1));
+    writematrix(coords1, outputFileName, 'Sheet', i);
+end
 
-writematrix(combinedMat, outputFileName, 'Sheet', 1);
 %% Supplementary functions
 %add to cluster in above point
 function [temp] = getTempVal(keyWord, checkVals, i, j)
