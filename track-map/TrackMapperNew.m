@@ -235,7 +235,7 @@ end
 delete(outputFileName);
 %writecell(groupedVals, outputFileName, 'Sheet', 1);
 for i = 1: numGroups
-    coords1 = cell2mat(groupedVals(1));
+    coords1 = cell2mat(groupedVals(i));
     writematrix(coords1, outputFileName, 'Sheet', i);
 end
 
