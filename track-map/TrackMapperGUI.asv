@@ -11,11 +11,7 @@ function [] = TrackMapperGUI()
 %
 % Author:  Matt Fig
 % Date:  7/15/2009
-clc;
-clear all;
-close all;
-screenSize = get(groot, 'ScreenSize');
-buttonSize = [260 80];
+screenSize = get(0, 'ScreenSize');
 
 S.fh = figure('units','pixels',...
               'menubar','none',...
@@ -23,13 +19,9 @@ S.fh = figure('units','pixels',...
               'numbertitle','off', 'WindowState', 'maximized');
 S.pb = uicontrol('style','push',...
                  'unit','pix',...
-                 'position',[screenSize(3) / 2 - buttonSize(1) / 2, 20, 260, 80],...
+                 'position',[screenSize / 2, 0, 260 80],...
                  'string','Upload Image');
 set(S.pb,'callback',{@pb_call,S})  % Set the callback for pushbutton.
-function [] = mapTrack(im)
-    
 function [] = pb_call(varargin)
-    subplot(2, 1, 1);
     [File_Name, Path_Name] = uigetfile('D:\Users\Public\Pictures\Sample Pictures');
     imshow([Path_Name,File_Name]);
-    
