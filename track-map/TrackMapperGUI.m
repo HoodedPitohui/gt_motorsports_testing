@@ -9,6 +9,7 @@ function TrackMapperGUI
     topLat = 33.778333;
     leftLong = -84.400556;
     rightLong = -84.39944;
+    outputFileName = 'ConePositions.xlsx';
     
     %% Set up the basic figure
     screenSize = get(groot, 'ScreenSize');
@@ -64,8 +65,6 @@ function TrackMapperGUI
     uplImgBtn = uibutton(btnPanel, 'Text', 'Upload Image', 'Position', btnUploadPos, ...
         'ButtonPushedFcn', @(btn, event) uplButtonPushed(btn, origImgPanel));
     btnCalcPos = [longLeftPos + buttonSize(1) * (5/4), panelSize(2) / 16, buttonSize(1), buttonSize(2)];
-    calcConesBtn = uibutton(btnPanel, 'Text', 'Calc. Cone Positions', 'Position', btnCalcPos, ...
-        'ButtonPushedFcn', @(btn, event) calcButtonPushed(btn, mainFig));
     
     btnDefLatPos = btnUploadPos;
     btnDefLatPos(2) = panelSize(2) / 1.4;
@@ -78,6 +77,10 @@ function TrackMapperGUI
     defaultLongBtn = uibutton(btnPanel, 'Text', 'Use Def. Longitude', 'Position',...
         btnDefLongPos, 'ButtonPushedFcn', @(btn, event) setDefaultLong(btn, ...
         longMinEdit, longMaxEdit, leftLong, rightLong));
+    
+    calcConesBtn = uibutton(btnPanel, 'Text', 'Calc. Cone Positions', 'Position', btnCalcPos, ...
+        'ButtonPushedFcn', @(btn, event) calcButtonPushed(btn, origImgPanel, latMinEdit, latMaxEdit,...
+        longMinEdit, longMaxEdit, outputFileName));
 end
 
 %% Button Functions
@@ -87,10 +90,29 @@ function uplButtonPushed(btn, imgPanel)
     im.ImageSource = strcat(Path_Name, File_Name);
 end
 
-function calcButtonPushed(btn, givenFig)
-    [File_Name, Path_Name] = uigetfile('D:\Users\Public\Pictures\Sample Pictures');
-    im = uiimage(imgPanel);
-    im.ImageSource = strcat(Path_Name, File_Name);
+function calcButtonPushed(btn, imgPanel, latMinEdit, latMaxEdit, longMinEdit, ...
+    longMaxEdit, outputFileName)
+    
+    botLat = latMinEdit.Value;
+    topLat = latMaxEdit.Value;
+    leftLong = longMinEdit.Value;
+    rightLong = longMaxEdit.Value;
+    im = imread(imgPanel.Children.ImageSource); %need to know which image
+    redPoints = (im(:,:,1)>=130 & im(:,:,2)<=60 & im(:,:,3)<=100) | ...
+        (im(:, :, 1) == 255 & im(:, :, 2) == 250 & im(:, :, 3) == 250) | ...
+        (im(:, :, 1) == 244 & im(:, :, 2) == 194 & im(:, :, 3) == 194) | ...
+        (im(:, :, 1) == 255 & im(:, :, 2) == 105 & im(:, :, 3) == 97) | ...
+        (im(:, :, 1) == 255 & im(:, :, 2) == 92 & im(:, :, 3) == 92) | ...
+        (im(:, :, 1) == 205 & im(:, :, 2) == 92 & im(:, :, 3) == 92) | ...
+        (im(:, :, 1) == 227 & im(:, :, 2) == 66 & im(:, :, 3) == 52) | ...
+        (im(:, :, 1) == 128 & im(:, :, 2) == 0 & im(:, :, 3) == 0) | ...
+        (im(:, :, 1) == 112 & im(:, :, 2) == 28 & im(:, :, 3) == 28) | ...
+        (im(:, :, 1) == 60 & im(:, :, 2) == 20 & im(:, :, 3) == 20) | ...
+        (im(:, :, 1) == 50 & im(:, :, 2) == 20 & im(:, :, 3) == 20); %rgbs for red
+    %http://www.workwithcolor.com/red-color-hue-range-01.htm
+    redCoords = find(redPoints == 1);
+    imRows = size(redPoints, 1);
+    imCols = size(redPoints, 2);
 end
 
 function setDefaultLat(btn, minField, maxField, latMin, latMax)
