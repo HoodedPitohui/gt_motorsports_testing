@@ -4,7 +4,7 @@ close all;
 
 %% Load the image and find its red point indices, identify basic characteristics
 outputFileName = 'ConePositions.xlsx';
-im = imread('testMap1.jpg');
+im = imread('testMap3.jpg');
 imshow(im)
 redPoints = (im(:,:,1)>=130 & im(:,:,2)<=60 & im(:,:,3)<=100) | ...
     (im(:, :, 1) == 255 & im(:, :, 2) == 250 & im(:, :, 3) == 250) | ...
