@@ -9,7 +9,7 @@ function TrackMapperGUI
     topLat = 33.778333;
     leftLong = -84.400556;
     rightLong = -84.39944;
-    outputFileName = 'ConePositions.xlsx';
+    outputFileName = 'ConePositions2.xlsx';
     
     %% Set up the basic figure
     screenSize = get(groot, 'ScreenSize');
@@ -68,19 +68,24 @@ function TrackMapperGUI
     
     btnDefLatPos = btnUploadPos;
     btnDefLatPos(2) = panelSize(2) / 1.4;
-    defaultLatBtn = uibutton(btnPanel, 'Text', 'Use Def. Latitude', 'Position',...
-        btnDefLatPos, 'ButtonPushedFcn', @(btn, event) setDefaultLat(btn, ...
+    defaultLatBtn = uibutton(btnPanel, 'Text', 'Use Default Latitude', 'Position',...
+        btnDefLatPos, 'WordWrap', 'On','ButtonPushedFcn', @(btn, event) setDefaultLat(btn, ...
         latMinEdit, latMaxEdit, botLat, topLat));
     
     btnDefLongPos = btnDefLatPos;
     btnDefLongPos(1) = latLeftPos;
-    defaultLongBtn = uibutton(btnPanel, 'Text', 'Use Def. Longitude', 'Position',...
-        btnDefLongPos, 'ButtonPushedFcn', @(btn, event) setDefaultLong(btn, ...
+    defaultLongBtn = uibutton(btnPanel, 'Text', 'Use Default Longitude', 'Position',...
+        btnDefLongPos, 'WordWrap', 'On', 'ButtonPushedFcn', @(btn, event) setDefaultLong(btn, ...
         longMinEdit, longMaxEdit, leftLong, rightLong));
+    
+    editGroupsLabel = uilabel(btnPanel, 'Text', 'Set Number of Groups', 'Position', ...
+    [longLeftPos + buttonSize(1) * (5/4), buttonFourStackingPos(4), buttonSize(1), buttonSize(2)]);
+    editGroupsPos = [longLeftPos + buttonSize(1) * (5/4), buttonFourStackingPos(3), buttonSize(1), buttonSize(2)];
+    numGroupsField = uieditfield(btnPanel, 'numeric', 'Value', 2, 'Position', editGroupsPos);
     
     calcConesBtn = uibutton(btnPanel, 'Text', 'Calc. Cone Positions', 'Position', btnCalcPos, ...
         'ButtonPushedFcn', @(btn, event) calcButtonPushed(btn, origImgPanel, checkImgPanel, latMinEdit, latMaxEdit,...
-        longMinEdit, longMaxEdit, outputFileName));
+        longMinEdit, longMaxEdit, outputFileName, numGroupsField));
 end
 
 %% Button Functions
@@ -105,7 +110,7 @@ function uplButtonPushed(btn, imgPanel)
 end
 
 function calcButtonPushed(btn, imgPanel, verifPanel, latMinEdit, latMaxEdit, longMinEdit, ...
-    longMaxEdit, outputFileName)
+    longMaxEdit, outputFileName, editGroupsPos)
     
     botLat = latMinEdit.Value;
     topLat = latMaxEdit.Value;
@@ -269,7 +274,7 @@ function calcButtonPushed(btn, imgPanel, verifPanel, latMinEdit, latMaxEdit, lon
     
     for i = 1: pointClSize(3)
         point = centers{i};
-        scatter(ax1, point(2), point(1) * (-1), 'filled');
+        scatter(ax1, point(2), point(1), 'filled');
     end
     
     diffLat = topLat - botLat;
@@ -283,7 +288,7 @@ function calcButtonPushed(btn, imgPanel, verifPanel, latMinEdit, latMaxEdit, lon
     combinedMat = [cell2mat(centerLats'), cell2mat(centerLongs')];
 
     %% Group the data into how many the user wants and output
-    numGroups = input("Please enter how many groups of data you want: ");
+    numGroups = editGroupsPos.Value;
     numPerGroup = floor(length(centerLats) / numGroups);
     numRem = rem(length(centerLats), numGroups);
     groupedPoints = sortrows(combinedMat, 1);
@@ -297,7 +302,7 @@ function calcButtonPushed(btn, imgPanel, verifPanel, latMinEdit, latMaxEdit, lon
                 pointCounter = pointCounter + 1;
             end
             groupedVals{i} = tempMat;
-        else
+        else;
             tempMat = [];
             for j = 1: numPerGroup
                 tempMat(j, :) = groupedPoints(pointCounter, :);

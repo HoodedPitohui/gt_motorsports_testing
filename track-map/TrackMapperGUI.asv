@@ -9,7 +9,7 @@ function TrackMapperGUI
     topLat = 33.778333;
     leftLong = -84.400556;
     rightLong = -84.39944;
-    outputFileName = 'ConePositions.xlsx';
+    outputFileName = 'ConePositions2.xlsx';
     
     %% Set up the basic figure
     screenSize = get(groot, 'ScreenSize');
@@ -68,16 +68,20 @@ function TrackMapperGUI
     
     btnDefLatPos = btnUploadPos;
     btnDefLatPos(2) = panelSize(2) / 1.4;
-    defaultLatBtn = uibutton(btnPanel, 'Text', 'Use Def. Latitude', 'Position',...
-        btnDefLatPos, 'ButtonPushedFcn', @(btn, event) setDefaultLat(btn, ...
+    defaultLatBtn = uibutton(btnPanel, 'Text', 'Use Default Latitude', 'Position',...
+        btnDefLatPos, 'WordWrap', 'On','ButtonPushedFcn', @(btn, event) setDefaultLat(btn, ...
         latMinEdit, latMaxEdit, botLat, topLat));
     
     btnDefLongPos = btnDefLatPos;
     btnDefLongPos(1) = latLeftPos;
-    defaultLongBtn = uibutton(btnPanel, 'Text', 'Use Def. Longitude', 'Position',...
-        btnDefLongPos, 'ButtonPushedFcn', @(btn, event) setDefaultLong(btn, ...
+    defaultLongBtn = uibutton(btnPanel, 'Text', 'Use Default Longitude', 'Position',...
+        btnDefLongPos, 'WordWrap', 'On', 'ButtonPushedFcn', @(btn, event) setDefaultLong(btn, ...
         longMinEdit, longMaxEdit, leftLong, rightLong));
     
+    editGroupsPos = [longLeftPos + buttonSize(1) * (5/4), btnUploadPos(2) * 3, btnUploadPos(2) * 5, ...
+        btnUploadPos(2) * 7];
+    numGroupsField = uieditfield(btnPanel, 'numeric', 'ValueDisplayFormat', '%.8f');
+        longMinEdit.Position = [longLeftPos, buttonFourStackingPos(3), buttonSize(1), buttonSize(2)];
     calcConesBtn = uibutton(btnPanel, 'Text', 'Calc. Cone Positions', 'Position', btnCalcPos, ...
         'ButtonPushedFcn', @(btn, event) calcButtonPushed(btn, origImgPanel, checkImgPanel, latMinEdit, latMaxEdit,...
         longMinEdit, longMaxEdit, outputFileName));
@@ -93,11 +97,15 @@ function uplButtonPushed(btn, imgPanel)
     %get the image dimensions and use that to size it in the panel
     imSize = size(imread(im.ImageSource));
     
-    %check if x-dim. > y.dim or x-dim <= y-dim.
-    if (imSize(1) < imSize(2))
-        im.Position = [0, 0, 
+    %scale down to the panel size and adjust appropriately
+    scaleFactor = imSize(1: 2) ./ imgPanel.Position(3: 4);
     
-    im.Position = [0,0, imgPanel.Position(3), imgPanel.Position(3)];
+    if (scaleFactor(1) < scaleFactor(2)) %size based on height
+        im.Position = [0, 0, imgPanel.Position(3), imSize(2) / scaleFactor(2)];
+    else
+        im.Position = [0, 0, imSize(1) / scaleFactor(1), imgPanel.Position(4)];
+    end
+    
 end
 
 function calcButtonPushed(btn, imgPanel, verifPanel, latMinEdit, latMaxEdit, longMinEdit, ...
@@ -279,8 +287,7 @@ function calcButtonPushed(btn, imgPanel, verifPanel, latMinEdit, latMaxEdit, lon
     combinedMat = [cell2mat(centerLats'), cell2mat(centerLongs')];
 
     %% Group the data into how many the user wants and output
-    numGroups = input("Please enter how many groups of data you want: ");
-    numPerGroup = floor(length(centerLats) / numGroups);
+    numGroups = 
     numRem = rem(length(centerLats), numGroups);
     groupedPoints = sortrows(combinedMat, 1);
     groupedVals = {};
