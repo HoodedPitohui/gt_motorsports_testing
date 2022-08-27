@@ -1,5 +1,6 @@
 function TrackMapperGUI
     %% Set constants and clear the environment
+    system('taskkill /F /IM EXCEL.EXE');
     all_fig = findall(0, 'type', 'figure');
     close(all_fig);
     clear all;
@@ -28,7 +29,7 @@ function TrackMapperGUI
     checkImgPanel.Position = [screenSize(3) * 7/ 8 - panelSize(1), screenSize(4) * 4.5 / 8, panelSize(1), panelSize(2)];
     
     outputPanel = uipanel(mainFig);
-    outputPanel.Title = 'Data Output Preview';
+    outputPanel.Title = 'Data Output Preview - Group #1';
     outputPanel.Position = [screenSize(3) / 8, screenSize(4) * 1 / 8, panelSize(1), panelSize(2)];
     
     btnPanel = uipanel(mainFig);
@@ -85,7 +86,7 @@ function TrackMapperGUI
     
     calcConesBtn = uibutton(btnPanel, 'Text', 'Calc. Cone Positions', 'Position', btnCalcPos, ...
         'ButtonPushedFcn', @(btn, event) calcButtonPushed(btn, origImgPanel, checkImgPanel, latMinEdit, latMaxEdit,...
-        longMinEdit, longMaxEdit, outputFileName, numGroupsField));
+        longMinEdit, longMaxEdit, outputFileName, numGroupsField, outputPanel));
 end
 
 %% Button Functions
@@ -110,7 +111,7 @@ function uplButtonPushed(btn, imgPanel)
 end
 
 function calcButtonPushed(btn, imgPanel, verifPanel, latMinEdit, latMaxEdit, longMinEdit, ...
-    longMaxEdit, outputFileName, editGroupsPos)
+    longMaxEdit, outputFileName, editGroupsPos, dataPanel)
     
     botLat = latMinEdit.Value;
     topLat = latMaxEdit.Value;
@@ -302,7 +303,7 @@ function calcButtonPushed(btn, imgPanel, verifPanel, latMinEdit, latMaxEdit, lon
                 pointCounter = pointCounter + 1;
             end
             groupedVals{i} = tempMat;
-        else;
+        else
             tempMat = [];
             for j = 1: numPerGroup
                 tempMat(j, :) = groupedPoints(pointCounter, :);
@@ -317,8 +318,22 @@ function calcButtonPushed(btn, imgPanel, verifPanel, latMinEdit, latMaxEdit, lon
         coords1 = cell2mat(groupedVals(i));
         writematrix(coords1, outputFileName, 'Sheet', i);
     end
-    
+    tableData = array2table(groupedVals{i}, 'VariableNames', {'Latitude', 'Longitude'});
+    uitData = uitable(dataPanel, 'Data', tableData);
+    uitData.Position = [dataPanel.Position(1) / 20, dataPanel.Position(2) * 3.75 / 6, ...
+        dataPanel.Position(3) * 5 / 6, dataPanel.Position(4) * 4.0 / 6 ];   
+    fullResultsBtnPos = [dataPanel.Position(1)/ 20, dataPanel.Position(4) * 0.25 / 6, ...
+        125, 40];
+    fullResultsBtn = uibutton(dataPanel, 'Text', 'See Full Results', 'Position', ...
+        fullResultsBtnPos, 'ButtonPushedFcn', @(btn, event) resButtonPushed(btn, outputFileName));
+ 
 end
+
+function resButtonPushed(btn, outputFileName)
+    winopen(outputFileName);
+end
+
+
 
 function setDefaultLat(btn, minField, maxField, latMin, latMax)
     minField.Value = latMin;
@@ -333,6 +348,7 @@ end
 
 %% Supplementary functions
 %add to cluster in above point
+
 function [temp] = getTempVal(keyWord, checkVals, i, j)
     if (strcmp(keyWord, 'left1'))
         temp = checkVals(i, j - 1);
