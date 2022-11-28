@@ -9,18 +9,32 @@ file_names = {'comp_tube_2'; 'comp_tube_3'; 'comp_tube_4'; 'comp_tube_5'; ...
 
 [comp_tube_2.summary_stats, comp_tube_2.part_descript, comp_tube_2.raw_data] = ...
     read_data(file_path, file_names(1));
+comp_tube_2.mass = 0.102794981 / 8 / 0.2248 / 9.8;
+
 [comp_tube_3.summary_stats, comp_tube_3.part_descript, comp_tube_3.raw_data] = ...
     read_data(file_path, file_names(2));
+comp_tube_3.mass = 0.119416484 / 8 / 0.2248 / 9.8;
+
 [comp_tube_4.summary_stats, comp_tube_4.part_descript, comp_tube_4.raw_data] = ...
     read_data(file_path, file_names(3));
+comp_tube_4.mass = 0.171062771 / 8 / 0.2248 / 9.8;
+
 [comp_tube_5.summary_stats, comp_tube_5.part_descript, comp_tube_5.raw_data] = ...
     read_data(file_path, file_names(4));
+comp_tube_5.mass = 0.069378165 / 8 / 0.2248 / 9.8;
+
 [comp_tube_6.summary_stats, comp_tube_6.part_descript, comp_tube_6.raw_data] = ...
     read_data(file_path, file_names(5));
+comp_tube_6.mass = 0.098637604 / 8 / 0.2248 / 9.8;
+
 [comp_tube_7.summary_stats, comp_tube_7.part_descript, comp_tube_7.raw_data] = ...
     read_data(file_path, file_names(6));
+comp_tube_7.mass = 0.115925082 / 8 / 0.2248 / 9.8;
+
 [comp_tube_8.summary_stats, comp_tube_8.part_descript, comp_tube_8.raw_data] = ...
     read_data(file_path, file_names(7));
+comp_tube_8.mass = 0.165825668 / 8 / 0.2248 / 9.8;
+
 [comp_tube_nb.summary_stats, comp_tube_nb.part_descript, comp_tube_nb.raw_data] = ...
     read_data(file_path, file_names(8));
 [comp_tube_wb.summary_stats, comp_tube_wb.part_descript, comp_tube_wb.raw_data] = ...
@@ -28,8 +42,15 @@ file_names = {'comp_tube_2'; 'comp_tube_3'; 'comp_tube_4'; 'comp_tube_5'; ...
 
 comp_tube_nb.summary_stats = renamevars(comp_tube_nb.summary_stats, ...
     ["x1NB"], ["Var1"]);
+comp_tube_nb.part_descript = renamevars(comp_tube_nb.part_descript, ...
+    ["x1NB"], ["Var1"]);
+comp_tube_nb.mass = 0.07214975 / 8 / 0.2248 / 9.8;
+
 comp_tube_wb.summary_stats = renamevars(comp_tube_wb.summary_stats, ...
     ["x1WB"], ["Var1"]);
+comp_tube_wb.part_descript = renamevars(comp_tube_wb.part_descript, ...
+    ["x1WB"], ["Var1"]);
+comp_tube_wb.mass = 0.07214975 / 8 / 0.2248 / 9.8;
 
 
  %% Calculate Data Values
@@ -63,7 +84,14 @@ function [property_table] = find_material_props(tube_struct, tube_name)
     NU12 = 1;
     
     %Data Value: G12 = Inplane Shear Modulus
-    G12 = 0;
+    arbit_force_1 = tube_struct.raw_data.Force(21);
+    arbit_deltax_1 = tube_struct.raw_data.EpsilonONEDisplacement(21);
+    length = tube_struct.part_descript.Var1("Length") * 10^(-3);
+    outer_diameter = tube_struct.part_descript.Var1("Outer diameter") * 10^(-3);
+    wall_thickness = tube_struct.part_descript.Var1("Wall thickness") * 10^(-3);
+    area = (outer_diameter^2 / 4 * pi) - (outer_diameter / 2 - wall_thickness)^2 ...
+        * pi;
+    G12 = arbit_force_1 * 10^3 * length / (area * arbit_deltax_1);
     
     %Data Value: G1Z = Transverse Shear Modulus for Shear in 1-Z Plane
     G1Z = 0;
@@ -72,7 +100,8 @@ function [property_table] = find_material_props(tube_struct, tube_name)
     G2Z = 0;
     
     %Data Value: RHO = Mass Density
-    RHO = 0;
+    volume = area * length;
+    RHO = tube_struct.mass / volume;
     
     %Data Value: A1 = Thermal expansion coefficient in 1-direction
     A1 = "[Leave Blank]";
